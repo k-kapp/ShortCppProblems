@@ -5,7 +5,7 @@
 
 using namespace std;
 
-using info_list = list<pair<int, pair<int, int> > >;
+using info_list = list<pair<long, pair<int, int> > >;
 
 void print_info_list(info_list lst)
 {
@@ -16,18 +16,41 @@ void print_info_list(info_list lst)
 	cout << endl;
 }
 
-info_list reduce(const list<int> &arr)
+bool check_dupl(info_list arr)
+{
+	int count = 0;
+	for (auto iter = arr.begin(); iter != arr.end(); advance(iter, 1))
+	{
+		if (next(iter, 1) != arr.end())
+		{
+			if ((long long)iter->first * (long long)next(iter, 1)->first >= 0)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+info_list reduce(const list<long> &arr)
 {
 	info_list reduced;
 	pair<int, int> curr_range;
 
-	int curr_sum = 0;
+	long curr_sum = 0;
 
 	int idx = 0;
 
 	for (auto &val : arr)
 	{
-		if (val*curr_sum >= 0)
+		/*
+		if ((long long)val * (long long)curr_sum >= 0)
+		{
+			curr_sum += val;
+		}
+		*/
+		if (((val >= 0) && (curr_sum >= 0)) || 
+			((val <= 0) && (curr_sum <= 0)))
 		{
 			curr_sum += val;
 		}
@@ -42,9 +65,16 @@ info_list reduce(const list<int> &arr)
 	}
 	reduced.push_back({curr_sum, {curr_range.first, idx - 1}});
 
+
+	if (!check_dupl(reduced))
+	{
+		cout << "Problem detected" << endl;
+	}
+
 	return reduced;
 }
 
+/*
 vector<info_list::iterator> reduce2(info_list &arr)
 {
 	bool no_erase;
@@ -80,23 +110,81 @@ vector<info_list::iterator> reduce2(info_list &arr)
 
 	return check_iters;
 }
+*/
+void reduce2(info_list &arr)
+{
+	bool no_erase;
 
-pair<info_list, info_list> reduce_all(const list<int> arr)
+
+	for (auto iter = arr.begin(); iter != arr.end();)
+	{
+		no_erase = true;
+		int between_sum = 0;
+		info_list::iterator orig_pos;
+		orig_pos = iter;
+		if ((next(iter, 1) != arr.end()) && (next(iter, 2) != arr.end()))
+		{
+			if ((abs(next(iter, 2)->first) >= abs(next(iter, 1)->first)) 
+				&& (abs(iter->first) >= abs(next(iter, 1)->first)))
+			{
+				iter->first = next(iter, 2)->first + next(iter, 1)->first + iter->first;
+				iter->second.second = next(iter, 2)->second.second;
+				arr.erase(next(iter, 1), next(iter, 3));
+				no_erase = false;
+			}
+		}
+		if (no_erase)
+		{
+			advance(iter, 1);
+		}
+	}
+
+
+
+}
+
+
+int sum_range(int begin, int end, const list<int> arr)
+{
+	int sum = 0;
+	for (auto iter = next(arr.begin(), begin); iter != next(arr.begin(), end); advance(iter, 1))
+	{
+		sum += *iter;
+	}
+	return sum;
+}
+
+pair<info_list, info_list> reduce_all(const list<long> arr)
 {
 	info_list reduced = reduce(arr);
 	auto reduced_init = reduced;
+	if (!check_dupl(reduced))
+	{
+		cout << "Warning: duplicates found!!" << endl;
+		cout << "reduced size: " << reduced.size() << endl;
+		/*
+		print_info_list(reduced);
+		for (auto &info_pair : reduced)
+		{
+			cout << info_pair.second.first << ", " << info_pair.second.second << ": " << sum_range(info_pair.second.first, info_pair.second.second, arr) << endl;
+		}
+		*/
+	}
 	unsigned int prev_size;
 	do
 	{
 		prev_size = reduced.size();
 		reduce2(reduced);
+		//cout << "reducing again" << endl;
 	} while (prev_size != reduced.size());
+	//cout << "final size: " << reduced.size() << endl;
+	//print_info_list(reduced);
 	return {reduced, reduced_init};
 }
 
 pair<int, pair<int, int> > find_max(const info_list &arr)
 {
-	pair<int, pair<int, int> > max_info;
+	pair<long, pair<int, int> > max_info;
 	max_info.first = -1;
 
 	info_list::const_iterator iter;
@@ -140,7 +228,7 @@ int all_positive(const info_list &arr)
 	return sum;
 }
 
-int max(const list<int> &orig)
+int max(const list<long> &orig)
 {
 	int max_val = -INT_MAX + 1;
 
@@ -164,9 +252,11 @@ int main(int argc, char * argv [])
 
 	vector<pair<int, int> > outs;
 
+	bool debug = false;
+
 	for (int run = 0; run < num_runs; run++)
 	{
-		list<int> inputs;
+		list<long> inputs;
 		int num_inputs;
 		int temp;
 
