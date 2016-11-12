@@ -1,4 +1,5 @@
 #include "Assign3.h"
+#include "Plot.h"
 #include <cstring>
 //#include <locale>
 #include <set>
@@ -39,7 +40,27 @@ bool is_number(const char * _str)
 }
 
 
+string get_plot_result_str(int plot_result)
+{
+	switch (plot_result)
+	{
+		case (1):
+		case (2):
+		case (3):
+		case (4):
+		{
+			auto ret_val = "'Alloy " + to_string(plot_result);
+			ret_val.push_back('\'');
+			return ret_val;
+		}
+		case (0):
+			return "'Objective function'";
+		default:
+			return "";
+	}
+}
 
+			
 
 void alloy(int pop_size, int iter, mutate_method m_method, cross_type cross_t, set<int> plot_results)
 {
@@ -49,28 +70,31 @@ void alloy(int pop_size, int iter, mutate_method m_method, cross_type cross_t, s
 
 
 	EvolAlgo obj = EvolAlgo(4, pop_size, m_method, cross_t, {{0, 100}, {0, 100}, {0, 100}, {0, 100}});
-	
 
 	if (iter < 0)
-		obj.run();
+		obj.run(30);
 	else
 		obj.run(iter);
 
 
 	obj.show_best();
-	obj.show_pop();
+	//obj.show_pop();
 
 	cout << "Time taken: " << obj.get_time() << endl;
 
 	vector<int> plot_idxes;
 	
 	for (int i = 1; i <= 3; i++)
-		plot_idxes.push_back(pop_size - i);
+		plot_idxes.push_back(i);
 
 	for (auto res_iter = plot_results.begin(); res_iter != plot_results.end(); advance(res_iter, 1))
 	{
-		Plot plt3 = Plot(obj.get_prog_vec(*res_iter));
-		plt3.plot(plot_idxes);
+		cout << "plotting..." << endl;
+		string unit;
+		if (*res_iter > 0)
+			unit = "kg";
+		plot(obj.get_prog_vec(*res_iter), plot_idxes, get_plot_result_str(*res_iter), 
+				"'Iteration number'", unit);
 	}
 }
 
@@ -82,7 +106,7 @@ avg_iter_result run_examples(int pop_size, int iter, mutate_method mutate_m, cro
 		EvolAlgo obj = EvolAlgo(4, pop_size, mutate_m, cross_t, {{0, 100}, {0, 100}, {0, 100}, {0, 100}});
 		if (iter == -1)
 		{
-			obj.run();
+			obj.run(30);
 			if (obj.best_achieved)
 			{
 				avg_result.avg += obj.get_optim_count();
@@ -120,7 +144,7 @@ avg_time_result run_time_examples(int pop_size, int iter, mutate_method mutate_m
 		EvolAlgo obj = EvolAlgo(4, pop_size, mutate_m, cross_t, {{0, 100}, {0, 100}, {0, 100}, {0, 100}});
 		if (iter == -1)
 		{
-			obj.run();
+			obj.run(30);
 			if (obj.best_achieved)
 			{
 				avg_result.avg += obj.get_time();
@@ -160,11 +184,8 @@ pair<vector<int>, vector<int> > pop_vs_iter(pair<int, int> pop_range, mutate_met
 	{
 
 		EvolAlgo obj = EvolAlgo(4, pop_size, m_method, cross_t,  {{0, 100}, {0, 100}, {0, 100}, {0, 100}});
-		obj.run();
+		obj.run(30);
 		pop_sizes.push_back(pop_size);
-		//iterations.push_back(obj.get_optim_count());
-		//iterations.push_back(run_examples(pop_size, -1, m_method, cross_t, 30).avg);
-		//iterations.push_back((int)((double)run_examples(pop_size, -1, m_method, cross_t, 30).num_optim/30.0*100));
 		iterations.push_back(run_time_examples(pop_size, -1, m_method, cross_t, 30).avg*1000);
 	}
 	return {pop_sizes, iterations};
@@ -180,12 +201,11 @@ void pop_vs_iter(pair<int, int> pop_range)
 	{
 
 		EvolAlgo obj = EvolAlgo(4, pop_size, m_method, cross_t,  {{0, 100}, {0, 100}, {0, 100}, {0, 100}});
-		obj.run();
+		obj.run(30);
 		pop_sizes.push_back(pop_size);
 		iterations.push_back(obj.get_optim_count());
 	}
-	Plot plt = Plot({pop_sizes, iterations});
-	plt.plot_comparison();
+	plot_comparison({pop_sizes, iterations});
 }
 
 void aa_pop_vs_iter()
@@ -220,8 +240,7 @@ void aa_pop_vs_iter()
 	plot_data.push_back(pop_vs_iter({15, 20}, RNORM, {STD, 0}));
 	plot_data.push_back(pop_vs_iter({15, 20}, RNORM, {WEIGHT, 3}));
 	
-	Plot plt(plot_data, name_data);
-	plt.plot_comp_bar();
+	plot_comp_bar(plot_data, name_data);
 }
 
 void aa_time_pop_vs_iter()
@@ -258,8 +277,9 @@ void aa_time_pop_vs_iter()
 	plot_data.push_back(pop_vs_iter({50, 100}, PPULL, {STD, 0}));
 
 	
-	Plot plt(plot_data, name_data);
-	plt.plot_comp_bar();
+	//Plot plt(plot_data, name_data);
+	//plt.plot_comp_bar();
+	plot_comp_bar(plot_data, name_data);
 }
 int main(int argc, char * argv [])
 {
@@ -271,7 +291,8 @@ int main(int argc, char * argv [])
 	cross_type cross_t;
 
 	m_method = PPULL;
-	analysis = ALLOY;	
+	cross_t  = {STD, 1};
+	analysis = ALLOY;
 	
 	int num_examples = 0;
 

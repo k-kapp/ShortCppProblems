@@ -12,6 +12,7 @@
 #include <cfloat>
 #include <assert.h>
 #include <string>
+#include <climits>
 using namespace std;
 
 enum mutate_method
@@ -42,7 +43,7 @@ struct individual
 	{
 		int pos_idx;
 		vector<double> new_pos = vector<double>(position.size());
-		for (auto this_pos_iter = position.begin(), other_pos_iter = other.position.begin(); this_pos_iter != position.end(); 
+		for (auto this_pos_iter = position.begin(), other_pos_iter = other.position.begin(); this_pos_iter != position.end();
 			advance(this_pos_iter, 1), advance(other_pos_iter, 1))
 		{
 			pos_idx = this_pos_iter - position.begin();
@@ -57,7 +58,7 @@ struct individual
 	{
 		int pos_idx;
 		vector<double> new_pos = vector<double>(position.size());
-		for (auto this_pos_iter = position.begin(), other_pos_iter = other.position.begin(); this_pos_iter != position.end(); 
+		for (auto this_pos_iter = position.begin(), other_pos_iter = other.position.begin(); this_pos_iter != position.end();
 			advance(this_pos_iter, 1), advance(other_pos_iter, 1))
 		{
 			pos_idx = this_pos_iter - position.begin();
@@ -72,9 +73,9 @@ struct individual
 	{
 		int pos_idx;
 		vector<double> new_pos = vector<double>(position.size());
-		for (auto pos_iter = position.begin(); pos_iter != position.end(); 
+		for (auto pos_iter = position.begin(); pos_iter != position.end();
 			advance(pos_iter, 1))
-		{	
+		{
 			pos_idx = pos_iter - position.begin();
 			new_pos[pos_idx] = (*pos_iter)*scalar;
 			if (new_pos[pos_idx] < 0)
@@ -87,7 +88,7 @@ struct individual
 	{
 		return this->value > rhs.value;
 	}
-	
+
 	bool operator < (const individual &rhs) const
 	{
 		return this->value < rhs.value;
@@ -101,25 +102,23 @@ struct individual
 	bool operator <= (const individual &rhs) const
 	{
 		return *this < rhs || this->value == rhs.value;
-	}	
+	}
 
 };
 
 class EvolAlgo
 {
 	public:
-		EvolAlgo(int dim, int pop_size);
 		EvolAlgo(int dim, int pop_size, mutate_method m_method, cross_type cross_t, vector<pair<double, double> > dim_limits);
 
 		void init_pop();
-		void crossover();
-		void weight_cross();
-		void no_cross();
-		void mutate();
+		void weight_cross(individual & new_indiv);
+		void crossover(individual & new_indiv);
+		void no_cross(individual & new_indiv);
 		void evaluate(individual &indiv);
 		void evaluate(int indiv_idx);
-		void run(int iter);
-		void run();
+		//void run(int iter);
+		void run(int no_change_stop, int max_iter = INT_MAX);
 
 		void show_best();
 		void show_pop();
@@ -132,14 +131,14 @@ class EvolAlgo
 		bool best_achieved;
 	private:
 		void mutate(individual &indiv);
-		individual crossover_sub(deque<individual>::iterator indiv1, deque<individual>::iterator indiv2);
-		individual weight_cross_sub();
+		void new_generation();
 		double plat(double kilos);
 		double iron(double kilos);
 		double copper(double kilos);
 		double material_cost(vector<double> perc, double kilos);
 		void insert_offspring(individual &indiv);
 		void update_prog_vecs();
+		void reverse_prog_vecs();
 		double time_taken;
 		int pop_size;
 		int dim;
@@ -158,7 +157,8 @@ class EvolAlgo
 		void mutate_rand_norm(individual &offspring);
 		vector<vector<double> > alloy1, alloy2, alloy3, alloy4, fitness;
 		void (EvolAlgo::* mutate_f)(individual &);
-		void (EvolAlgo::* cross_f)();
+		void (EvolAlgo::* cross_f)(individual &);
+		unsigned int indiv_idx;
 };
 
-#endif	
+#endif

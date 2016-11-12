@@ -1,7 +1,7 @@
 #ifndef PLOT_H
 #define PLOT_H
 
-#include "../gnuplot-iostream/gnuplot-iostream.h"
+#include "gnuplot-iostream.h"
 #include <boost/tuple/tuple.hpp>
 #include <vector>
 #include <utility>

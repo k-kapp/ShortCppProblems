@@ -1,8 +1,9 @@
-all:  Assign3.o main.o main clean_interm
+all:  Assign3.o main.o main clean
 
 CLSDEPEND = Assign3.h Plot.h
 MAINDEPEND = Assign3.h Plot.h
-MAINALL = main.o Assign3.o
+PLOTDEPEND = Plot.h
+MAINALL = main.o Assign3.o Plot.o
 
 CC = g++
 DEBUG = -g
@@ -20,8 +21,11 @@ Assign3.o : $(CLSDEPEND)
 main.o : $(MAINDEPEND)
 	$(CC) $(CFLAGS) main.cpp $(POSTFLAGS)
 
-clean_interm:
-	\rm *.o
+Plot.o : $(PLOTDEPEND)
+	$(CC) $(CFLAGS) Plot.cpp $(POSTFLAGS)
 
-clean: 
-	\rm main
+.PHONY: clean
+
+clean:
+	rm *.o
+
