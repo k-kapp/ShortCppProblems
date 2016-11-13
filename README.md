@@ -1,5 +1,4 @@
 # ShortCppProblems
-A collection of my solutions to shorter C++ problems from various websites. Will keep on updating indefinitely (hopefully!).
 
 This repository contains various small programming problems solved in C++. They are organised as follows
 
