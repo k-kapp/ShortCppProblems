@@ -10,5 +10,6 @@ This folder contains implementations of various data structures. They are as fol
 
 `minmax_heap_arr.cpp` also contains an object oriented implementation of a min or max heap. However, this time it is implemented via an array, and not with `node` objects. Implementing with a array is much simpler and more efficient.
 
-`hash_table1.cpp` contains an implementation of a hash table (see https://en.wikipedia.org/wiki/Hash_table). The table was implemented via separate chaining, and with hash function `djb2` (see source code for details). I plan to implement a hash table with open addressing, when I get the time again. 
+`hash_table1.cpp` contains an object oriented implementation of a hash table (see https://en.wikipedia.org/wiki/Hash_table). The table was implemented via separate chaining, and with hash function `djb2` (see source code for details). I plan to implement a hash table with open addressing, when I get the time again. 
 
+`bst.cpp` contains a binary search tree, without rebalancing.
