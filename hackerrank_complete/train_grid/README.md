@@ -11,7 +11,7 @@ Given a map of Gridland and its k train tracks, find and print the number of cel
 
 My solution is roughly as follows:
 
-Since train tracks can run only horizontally, overlap can also happen only horizontally. Therefore, for each row, store a list of pairs, where each pair describes a contiguous section occupied by train tracks. Now use the following algorithm:
+Since train tracks can run only horizontally, overlap can also happen only horizontally. Therefore, for each row, store a linked list of pairs, where each pair describes a contiguous section occupied by train tracks. Now use the following algorithm:
 
 1. When inserting a new train track Q for a particular row, find the corresponding list for that row, then examine the pairs in the row. Q is represented as a pair, with the starting and ending columns for the track.
 
