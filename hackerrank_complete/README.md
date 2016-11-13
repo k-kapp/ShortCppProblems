@@ -1,0 +1,1 @@
+Various solutions to medium to hard difficulty programming problems from the website Hackerrank (www.hackerrank.com). Note that a lot of these problems can trivially be implemented if efficiency was not a concern. However, the test cases usually included very large data files as input, therefore the challenge was in writing efficient code.
