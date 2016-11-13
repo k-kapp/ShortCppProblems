@@ -11,3 +11,8 @@ Initially, the editor contains an empty string S. The following four operations 
 
 More detailed information may be found here: https://www.hackerrank.com/challenges/simple-text-editor
 
+My implementation is as follows:
+
+When either of the append or delete functions are executed, a record of their changes to S is pushed onto a stack. When undo is called, the element on top of the stack is examined so that the changes to S (made by the last call to either 1 or 2) may be reversed. This record is then popped off the stack, since we cannot undo a single action twice (according to 4).
+
+The stack was implemented using C++'s list structure, which is a doubly linked list (a dynamic array (vector) could also have been used).
