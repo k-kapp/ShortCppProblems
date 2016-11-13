@@ -12,4 +12,4 @@ This folder contains implementations of various data structures. They are as fol
 
 `hash_table1.cpp` contains an object oriented implementation of a hash table (see https://en.wikipedia.org/wiki/Hash_table). The table was implemented via separate chaining, and with hash function `djb2` (see source code for details). I plan to implement a hash table with open addressing, when I get the time again. 
 
-`bst.cpp` contains a binary search tree, without rebalancing.
+`bst.cpp` contains a (mostly) procedurally implemented binary search tree, without rebalancing.
