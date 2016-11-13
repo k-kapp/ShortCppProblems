@@ -13,5 +13,5 @@ Given an array A, first sort the array from smallest to largest. Then, go throug
 3. If c x d < 0, take the element after j, which is now j, and similarly, take the element before k, which is now the new k.
 4. If j and k are the same elements, or j is now an element after k, assign the element after element i, to i, and start again at 1.
 5. If |j - i| = K, then take element j, and all elements after element j having the same value, and count them. Add this count to the total count.
-6. If |k - i| = K, then take element k, and all elements after k having the same value, and count them. Add this count to the total count.
+6. If |k - i| = K, then take element k, and all elements before k having the same value, and count them. Add this count to the total count.
 7. If element i is the last element in the array, stop the algorithm. Return the total count.
