@@ -10,3 +10,4 @@ TODO:
 
 Plots example:
 
+<img src="Screenshots/variable0.jpg" width="250">
