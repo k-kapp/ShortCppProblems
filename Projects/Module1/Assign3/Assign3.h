@@ -104,12 +104,18 @@ struct individual
 		return *this < rhs || this->value == rhs.value;
 	}
 
+	bool operator == (const individual &rhs) const
+	{
+		return this->value == rhs.value;
+	}
+
 };
+using prog_type = vector<vector<vector<double> > >;
 
 class EvolAlgo
 {
 	public:
-		EvolAlgo(int dim, int pop_size, mutate_method m_method, cross_type cross_t, vector<pair<double, double> > dim_limits);
+		EvolAlgo(int dim, int pop_size, function<double(const vector<double> &)> obj_func, bool max, mutate_method m_method, cross_type cross_t, vector<pair<double, double> > dim_limits);
 
 		void init_pop();
 		void weight_cross(individual & new_indiv);
@@ -117,7 +123,6 @@ class EvolAlgo
 		void no_cross(individual & new_indiv);
 		void evaluate(individual &indiv);
 		void evaluate(int indiv_idx);
-		//void run(int iter);
 		void run(int no_change_stop, int max_iter = INT_MAX);
 
 		void show_best();
@@ -126,16 +131,12 @@ class EvolAlgo
 		int num_iter();
 		int get_optim_count();
 		double get_time();
-
-
+		int get_dim();
 		bool best_achieved;
+
 	private:
 		void mutate(individual &indiv);
 		void new_generation();
-		double plat(double kilos);
-		double iron(double kilos);
-		double copper(double kilos);
-		double material_cost(vector<double> perc, double kilos);
 		void insert_offspring(individual &indiv);
 		void update_prog_vecs();
 		void reverse_prog_vecs();
@@ -155,10 +156,14 @@ class EvolAlgo
 		uniform_int_distribution<int> unif_int_pop;
 		void show_indiv(deque<individual>::iterator indiv_iter);
 		void mutate_rand_norm(individual &offspring);
-		vector<vector<double> > alloy1, alloy2, alloy3, alloy4, fitness;
 		void (EvolAlgo::* mutate_f)(individual &);
 		void (EvolAlgo::* cross_f)(individual &);
+		function<double(const vector<double> &)> obj_func;
 		unsigned int indiv_idx;
+		bool max;
+		function<bool(double, double)> comp_vals;
+		function<bool(const individual &, const individual &)> comp_indivs;
+		prog_type all_prog_vecs;
 };
 
 #endif

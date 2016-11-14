@@ -46,9 +46,9 @@ void plot(const vector< vector<double> > &raw_data, const vector<int> &indivs_id
 	Gnuplot gp;
 
 	if (title.size() > 0)
-		gp << "set title " << title << "\n";
+		gp << "set title '" << title << "'\n";
 	if (x_label.size() > 0)
-		gp << "set xlabel " << x_label << "\n";
+		gp << "set xlabel '" << x_label << "'\n";
 	gp << "plot ";
 
 	for (auto idx_iter = indivs_idx.begin(); 

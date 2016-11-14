@@ -31,9 +31,9 @@ sum_vec(vector<T> vec)
                                             every iteration. This is only for studying the
                                             evolution of the solution over many iterations
 */
-EvolAlgo::EvolAlgo(int dim, int pop_size, mutate_method m_method, cross_type cross_t,
+EvolAlgo::EvolAlgo(int dim, int pop_size, function<double(const vector<double> &)> obj_func, bool max, mutate_method m_method, cross_type cross_t,
                    vector<pair<double, double> > dim_ranges)
-                    :  pop_size(pop_size), dim(dim), dim_ranges(dim_ranges)
+                    :  pop_size(pop_size), dim(dim), dim_ranges(dim_ranges), obj_func(obj_func), max(max)
 {
 	unif_real = uniform_real_distribution<double> (0.0, 1.0);
 	unif_int_dim = uniform_int_distribution<int> (0, this->dim - 1);
@@ -41,11 +41,21 @@ EvolAlgo::EvolAlgo(int dim, int pop_size, mutate_method m_method, cross_type cro
 	norm_dist = normal_distribution<double> (0.0, 1.0);
 	generator.seed(chrono::steady_clock::now().time_since_epoch().count());
 
-	alloy1 = vector<vector<double> >(pop_size);
-	alloy2 = vector<vector<double> >(pop_size);
-	alloy3 = vector<vector<double> >(pop_size);
-	alloy4 = vector<vector<double> >(pop_size);
-	fitness = vector<vector<double> >(pop_size);
+	if (max)
+	{
+		comp_vals = greater_equal<double>();
+		comp_indivs = greater_equal<const individual &>();
+	}
+	else
+	{
+		comp_vals = less_equal<double>();
+		comp_indivs = less_equal<const individual &>();
+	}
+
+	for (int i = 0; i <= dim; i++)
+	{
+		all_prog_vecs.push_back(vector<vector<double> >(pop_size));
+	}
 
 	count = 0;
 
@@ -86,6 +96,11 @@ EvolAlgo::EvolAlgo(int dim, int pop_size, mutate_method m_method, cross_type cro
 
 }
 
+int
+EvolAlgo::get_dim()
+{
+	return dim;
+}
 
 /*
 initialize population of solutions
@@ -107,13 +122,11 @@ EvolAlgo::init_pop()
 		pop.push_back({pos, 0});
 		evaluate(pop.back());
 	}
-	sort(pop.begin(), pop.end());
+
+	sort(pop.begin(), pop.end(), comp_indivs);
 }
 
-//TODO: Still need to finish evaluation function below (READ ASSIGNMENT BRIEF FOR DETAILS)
 
-//TODO: state that iron discount was based on per kilogram (not pro rata, eg if 4.5 kilos
-//      of platinum was bought, discount is given on 4 kilos)
 
 /*
     get the number of iterations that have passed
@@ -134,35 +147,11 @@ EvolAlgo::get_optim_count()
     Evaluate the solution represented by indiv parameter, then assign the value
         indiv's fitness
 */
+
 void
 EvolAlgo::evaluate(individual &indiv)
 {
-	vector<double> pos = indiv.position;
-
-	double plat_kilos = pos[0]*0.2 + pos[1]*0.3 + pos[2]*0.8 + pos[3]*0.1;
-	double iron_kilos = pos[0]*0.7 + pos[1]*0.2 + pos[2]*0.1 + pos[3]*0.5;
-	double copper_kilos = pos[0]*0.1 + pos[1]*0.5 + pos[2]*0.1 + pos[3]*0.4;
-
-	double base = pos[0]*3000 + pos[1]*3100 + pos[2]*5200 + pos[3]*2500
-                    - exp(0.01*(25*pos[0] + 23*pos[1] + 35*pos[2] + 20*pos[3]))
-                    - plat(plat_kilos) - iron(iron_kilos) - copper(copper_kilos);
-
-	//(int) is taken here, check comment above this function
-	double iron_discount = 300*((int)(plat_kilos));
-
-	//make sure we get discount on the iron we needed to buy only
-	//TODO: maybe remove this feature, and say the company made money on selling extra iron?
-	if (iron_discount > 300*(pos[0]*0.7 + pos[1]*0.2 + pos[2]*0.1 + pos[3]*0.5))
-		iron_discount = 300*(pos[0]*0.7 + pos[1]*0.2 + pos[2]*0.1 + pos[3]*0.5);
-
-	double copper_discount = 0;
-
-	if (copper_kilos > 8)
-		copper_discount = 800*(copper_kilos)*0.1;
-
-	base += (iron_discount + copper_discount);
-
-	indiv.value = base;
+	indiv.value = obj_func(indiv.position);
 }
 
 /*
@@ -176,46 +165,6 @@ EvolAlgo::evaluate(int indiv_idx)
 	cout << "Individual fitness: " << pop[indiv_idx].value << endl;
 }
 
-/*
-    Calculate and return the cost of platinum based on the number of
-        kilograms
-*/
-double
-EvolAlgo::plat(double kilos)
-{
-	return 1200*kilos + 10*kilos*kilos;
-}
-
-/*
-    Calculate and return the cost of iron based on the number of
-        kilograms
-*/
-double
-EvolAlgo::iron(double kilos)
-{
-	return 300*kilos;
-}
-
-/*
-    Calculate and return the cost of copper based on the number of
-        kilograms
-*/
-double
-EvolAlgo::copper(double kilos)
-{
-	return 800*kilos;
-}
-
-/*
-    calculate and return the total cost of all materials. the perc vector contains
-        the percentage of all materials that each material makes up. kilos is the
-        weight of all materials
-*/
-double
-EvolAlgo::material_cost(vector<double> perc, double kilos)
-{
-	return plat(kilos*perc[0]) + iron(kilos*perc[1]) + copper(kilos*perc[2]);
-}
 
 /*
     return the time taken by the algorithm so far
@@ -324,41 +273,16 @@ EvolAlgo::show_pop()
 void
 EvolAlgo::update_prog_vecs()
 {
-	vector<vector<double> >::iterator prog_al1_iter, prog_al2_iter, prog_al3_iter,
-                                        prog_al4_iter, prog_fit_iter;
-	prog_al1_iter = alloy1.begin();
-	prog_al2_iter = alloy2.begin();
-	prog_al3_iter = alloy3.begin();
-	prog_al4_iter = alloy4.begin();
-	prog_fit_iter = fitness.begin();
-	for (auto indiv_iter = pop.begin(); indiv_iter != pop.end();
-            advance(indiv_iter, 1),
-            advance(prog_al1_iter, 1),
-            advance(prog_al2_iter, 1),
-            advance(prog_al3_iter, 1),
-            advance(prog_al4_iter, 1),
-            advance(prog_fit_iter, 1))
+	for (auto indiv_iter = pop.begin(); indiv_iter != pop.end(); advance(indiv_iter, 1))
 	{
-		prog_al1_iter->push_back(indiv_iter->position[0]);
-		prog_al2_iter->push_back(indiv_iter->position[1]);
-		prog_al3_iter->push_back(indiv_iter->position[2]);
-		prog_al4_iter->push_back(indiv_iter->position[3]);
-		prog_fit_iter->push_back(indiv_iter->value);
+		for (int i = 0; i < dim; i++)
+		{
+			all_prog_vecs.at(i).at(distance(pop.begin(), indiv_iter)).push_back(indiv_iter->position.at(i));
+		}
+		all_prog_vecs.at(dim).at(distance(pop.begin(), indiv_iter)).push_back(indiv_iter->value);
 	}
 }
-/*
-void
-EvolAlgo::weight_cross()
-{
-	for (int i = 0; i < pop_size; i++)
-	{
-		individual offspring = weight_cross_sub();
-		(this->*(mutate_f))(offspring);
-		evaluate(offspring);
-		insert_offspring(offspring);
-	}
-}
-*/
+
 
 void
 EvolAlgo::new_generation()
@@ -461,7 +385,7 @@ EvolAlgo::mutate_rand_norm(individual &offspring)
 void
 EvolAlgo::insert_offspring(individual &offspring)
 {
-	if (offspring < pop.front())
+	if (!comp_indivs(offspring, pop.front()))
 		return;
 
 	int curr_idx = (int)((pop_size - 1)/2);
@@ -469,7 +393,7 @@ EvolAlgo::insert_offspring(individual &offspring)
 	int higher_idx = pop_size - 1;
 	while (true)
 	{
-		if (offspring >= pop[curr_idx])
+		if (comp_indivs(offspring,  pop[curr_idx]))
 		{
 			if (curr_idx == pop_size - 1)
 			{
@@ -477,7 +401,7 @@ EvolAlgo::insert_offspring(individual &offspring)
 				pop.push_back(offspring);
 				return;
 			}
-			if (offspring <= pop[curr_idx + 1])
+			if (!comp_indivs(offspring, pop[curr_idx + 1]) || offspring == pop[curr_idx + 1])
 			{
 				pop.insert(next(pop.begin(), curr_idx + 1), offspring);
 				pop.pop_front();
@@ -490,7 +414,7 @@ EvolAlgo::insert_offspring(individual &offspring)
 		}
 		else
 		{
-			if (offspring >= pop[curr_idx - 1])
+			if (comp_indivs(offspring, pop[curr_idx - 1]))
 			{
 				pop.insert(next(pop.begin(), curr_idx), offspring);
 				pop.pop_front();
@@ -512,28 +436,17 @@ EvolAlgo::insert_offspring(individual &offspring)
 void
 EvolAlgo::reverse_prog_vecs()
 {
-	reverse(fitness.begin(), fitness.end());
-	reverse(alloy1.begin(), alloy1.end());
-	reverse(alloy2.begin(), alloy2.end());
-	reverse(alloy3.begin(), alloy3.end());
-	reverse(alloy4.begin(), alloy4.end());
+	for (auto prog_vec_iter = all_prog_vecs.begin(); prog_vec_iter != all_prog_vecs.end();
+			advance(prog_vec_iter, 1))
+	{
+		reverse(prog_vec_iter->begin(), prog_vec_iter->end());
+	}
 }
 
-vector<vector<double> >
+
+vector<vector<double> > 
 EvolAlgo::get_prog_vec(int type)
 {
-	assert(type > -1 && type < 5);
-	switch (type)
-	{
-		case (0):
-			return fitness;
-		case (1):
-			return alloy1;
-		case (2):
-			return alloy2;
-		case (3):
-			return alloy3;
-		case (4):
-			return alloy4;
-	}
+	assert(type > -1 && type <= dim);
+	return all_prog_vecs.at(type);
 }
