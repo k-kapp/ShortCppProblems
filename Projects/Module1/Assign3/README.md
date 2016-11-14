@@ -10,4 +10,8 @@ TODO:
 
 Plots example:
 
-<img src="Screenshots/variable0.jpg" width="250">
+<img src="Screenshots/variable0.jpg" width="500">
+<img src="Screenshots/variable1.jpg" width="500">
+<img src="Screenshots/variable2.jpg" width="500">
+<img src="Screenshots/variable3.jpg" width="500">
+<img src="Screenshots/fitness.jpg" width="500">
