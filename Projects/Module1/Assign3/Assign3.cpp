@@ -20,16 +20,13 @@ sum_vec(vector<T> vec)
         Parameters:
             dim: number of dimensions of the problem
             pop_size: population size (population of solutions)
+			obj_func: objective function (must be passed as a function object that 
+						receives a vector of doubles and returns a double)
+						TODO: implement EvolAlgo class such that objective function may be templated
+			max		: true for maximisation problem, false for minimisation problem
             m_method: method by which mutation is done on each individual
             cross_t: type of crossover operator to apply to each individual
             dim_ranges: ranges of each dimension
-
-        selected class variables:
-            alloy1 to alloy4, and fitness: these vectors contain a vector for each
-                                            individual in population. Each of these vectors
-                                            in turn contain the value of each attribute at
-                                            every iteration. This is only for studying the
-                                            evolution of the solution over many iterations
 */
 EvolAlgo::EvolAlgo(int dim, int pop_size, function<double(const vector<double> &)> obj_func, bool max, mutate_method m_method, cross_type cross_t,
                    vector<pair<double, double> > dim_ranges)
@@ -270,6 +267,12 @@ EvolAlgo::show_pop()
 	}
 }
 
+
+/*
+	Note that the prog vecs store all the information on each individual at each iteration.
+		this is what enables the plotting functions after optimisation, where one may see
+		how the best individual of the population changed for all iterations.
+*/
 void
 EvolAlgo::update_prog_vecs()
 {
@@ -296,6 +299,12 @@ EvolAlgo::new_generation()
 		insert_offspring(offspring);
 	}
 }
+
+/*
+	for each of the crossover and mutation functions below, 
+		the new individual is passed as a reference, so that
+		changes may be made to it.
+*/
 
 void 
 EvolAlgo::weight_cross(individual &new_indiv)
@@ -345,6 +354,10 @@ EvolAlgo::no_cross(individual &new_indiv)
 }
 
 
+/*
+	implements push-pull mutation.
+		TODO: make name more descriptive
+*/
 void
 EvolAlgo::mutate(individual &offspring)
 {
@@ -382,6 +395,15 @@ EvolAlgo::mutate_rand_norm(individual &offspring)
 	}
 }
 
+
+/*
+	inserts the offspring, passed as an argument, into the population vector.
+		If the offspring is weaker than the weakest individual in the population,
+		no insertion is made. If insertion is made, weakest individual is taken out,
+		so that population vector's size remains constant.
+
+		Binary search is used for finding the insertion point more efficiently.
+*/
 void
 EvolAlgo::insert_offspring(individual &offspring)
 {
