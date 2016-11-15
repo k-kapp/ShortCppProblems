@@ -54,6 +54,10 @@ void print_vec(vector<int> vec)
 		}
 	}
 }
+
+/*
+	this function only prints the first three generations of the tree
+*/
 void print_tree(shared_ptr<node> root)
 {
 	if (!root)
@@ -94,6 +98,9 @@ void print_tree(shared_ptr<node> root)
 
 }
 
+/*
+	inserts val in the appropriate position
+*/
 int insert_inorder(key_cont &keys, int val)
 {
 	for (auto key_iter = keys.begin(); key_iter != keys.end(); advance(key_iter, 1))
@@ -123,6 +130,18 @@ node &get_next_node(node &root, int val)
 	return *root.children.back();
 }
 
+/*
+	inserts val into root. Also takes care of cases where the root contains too many keys. In these cases, 
+		the root is broken in two, with the median key of root getting sent to root's parent.
+
+		new_child is not a null pointer in cases where this root node is finding a new position for a child node
+			previously broken up due to an insertion. In these cases, val would be the value of the median key 
+			from the direct descendant of this root node, and new child is the left half of the child node which was broken up
+		
+		this function returns the value of the median key, as well as the left of the broken up node if it
+			was broken up due to it containing too many nodes. Otherwise, if insertion is successful without the need
+			to break it up, then it returns -1 and a null pointer
+*/
 pair<int, shared_ptr<node> > insert_here(node &root, int val, shared_ptr<node> new_child = shared_ptr<node>(nullptr))
 {
 
@@ -217,6 +236,9 @@ void rotate_from_left(node &left, node &right, node &parent, int idx)
 	left.keys.pop_back();
 }
 
+/*
+	merges two nodes that did not have enough keys for sharing
+*/
 void merge(node &left, child_cont::iterator right_iter, node &parent)
 {
 	int idx = distance(parent.children.begin(), right_iter) - 1;
@@ -316,6 +338,11 @@ pair<int *, child_cont::iterator> remove_here(node &root, int val)
 	return {nullptr, next(root.children.end(), -1)};
 }
 
+/*
+	the helper function was written so that the "real" function may be called more elegantly,
+		with less parameters. The parameters in the remove_help function is to assist with 
+		recursion
+*/
 void remove_help(shared_ptr<node> &root, int root_idx, shared_ptr<node> parent, int val,
 					int rightmost, int * insertee_replace)
 {
