@@ -7,6 +7,9 @@
 
 using namespace std;
 
+/*
+	example objective function for use with the genetic algorithm
+*/
 double colville_func(const vector<double> &inputs)
 {
 	return 100*pow((inputs.at(0) - pow(inputs.at(1), 2)), 2) + pow((1 - inputs.at(0)), 2) + 
@@ -15,6 +18,9 @@ double colville_func(const vector<double> &inputs)
 			19.8*(inputs.at(1) - 1)*(inputs.at(3) - 1);
 }
 
+/*
+	this function does some preprocessing of data for the plotting function.
+*/
 void plot_types(EvolAlgo &obj, vector<int> prog_types)
 {
 	for (auto int_iter = prog_types.begin(); int_iter != prog_types.end(); advance(int_iter, 1))

@@ -1,3 +1,12 @@
+/*
+	this file contains implementations of some useful plotting functions for the genetic algorithm
+		implementation. 
+
+		TODO: make plot function more standalone (e.g. no processing of data may be done by plot
+				function. It must only plot
+*/
+
+
 #include "gnuplot-iostream/gnuplot-iostream.h"
 #include <vector>
 #include <utility>
