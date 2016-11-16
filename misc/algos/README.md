@@ -13,7 +13,7 @@ So far I have:
 
 Quicksort:
 
-The algorithm achieves sorting by swapping values alone. For example, if we have the following array (to be sorted in ascending order)
+The quicksort implementation that I wrote in `quicksort.cpp` achieves sorting by swapping values alone. For example, if we have the following array (to be sorted in ascending order)
 
 4 6 9 2 5
 
