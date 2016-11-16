@@ -31,8 +31,8 @@ Container generate_randoms(int num)
 	return return_vals;
 }
 
-template<typename Container>
-bool sorted(const Container &vals, function<bool(typename Container::value_type, typename Container::value_type)> comp)
+template<typename Container, typename Comparator>
+bool sorted(const Container &vals, Comparator comp)
 {
 	if (vals.begin() == vals.end())
 		return true;
@@ -46,13 +46,13 @@ bool sorted(const Container &vals, function<bool(typename Container::value_type,
 	return true;
 }
 
-template<typename T>
-void quicksort(typename T::iterator begin, typename T::iterator end, function<bool(typename T::value_type, typename T::value_type)> comp)
+template<typename Iterator, typename Comparator>
+void quicksort(Iterator begin, Iterator end, Comparator comp)
 {
 	if (begin == end)
 		return;
-	typename T::iterator q_iter = begin;
-	typename T::iterator curr_iter = next(begin, 1);
+	Iterator q_iter = begin;
+	Iterator curr_iter = next(begin, 1);
 
 	while (curr_iter != end)
 	{
@@ -67,8 +67,8 @@ void quicksort(typename T::iterator begin, typename T::iterator end, function<bo
 		}
 		advance(curr_iter, 1);
 	}
-	quicksort<vector<int> >(begin, q_iter, comp);
-	quicksort<vector<int> >(next(q_iter, 1), end, comp);
+	quicksort(begin, q_iter, comp);
+	quicksort(next(q_iter, 1), end, comp);
 }
 
 int main(int argc, char * argv [])
@@ -76,7 +76,7 @@ int main(int argc, char * argv [])
 	
 	vector<int> my_vec = generate_randoms<vector<int> >(200);
 
-	quicksort<vector<int> >(my_vec.begin(), my_vec.end(), function<bool(int, int)>(less<int>()));
+	quicksort(my_vec.begin(), my_vec.end(), less<int>());
 
 	for (auto &val : my_vec)
 	{
@@ -84,7 +84,7 @@ int main(int argc, char * argv [])
 	}
 	cout << endl;
 
-	if (sorted(my_vec, function<bool(int, int)>(less_equal<int>())))
+	if (sorted(my_vec, less_equal<int>()))
 	{
 		cout << "Sorting OK" << endl;
 	}
