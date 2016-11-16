@@ -31,7 +31,7 @@ then we simply swap 4 and 2, which again yields the proper array for quicksort t
 + start with the element after the pivot, then proceed until the last element is checked. In this way, the element we are checking is always after the pivot.
 + if the element in question is in the wrong position relative to the pivot, then
  - if the element is just after the pivot, swap the element with the pivot and continue to the next element
- - if the element is not just after the pivot, then swap the element in question with the element just after the pivot, then swap the pivot with the element just after it.
+ - if the element is not just after the pivot, but further on in the array, then swap the element in question with the element just after the pivot, then swap the pivot with the element just after it.
  
 For more information on the quicksort algorithm, please consult https://en.wikipedia.org/wiki/Quicksort
 
