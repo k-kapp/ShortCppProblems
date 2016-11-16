@@ -33,5 +33,5 @@ then we simply swap 4 and 2, which again yields the proper array for quicksort t
  - if the element is just after the pivot, swap the element with the pivot and continue to the next element
  - if the element is not just after the pivot, then swap the element in question with the element just after the pivot, then swap the pivot with the element just after it.
  
-
+For more information on the quicksort algorithm, please consult https://en.wikipedia.org/wiki/Quicksort
 
