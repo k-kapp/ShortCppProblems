@@ -7,3 +7,31 @@ Note that I DO NOT simply read pseudocode from a textbook and implement it in C+
 So far I have:
 
 + `mergesort.cpp` contains a memory-efficient, procedural implementation of the mergesort algorithm
++ `quicksort.cpp` contains also a memory-efficient implementation of the quicksort algorithm. No allocations or deallocations are made during the sorting procedure.
+
+#Additional Notes
+
+Quicksort:
+
+The algorithm achieves sorting by swapping values alone. For example, if we have the following array (to be sorted in ascending order)
+
+4 6 9 2 5
+
+then, when 4 is compared with 2 and it is found that their ordering is wrong, 2 gets swapped with 6, then 4 is swapped with 2, leading to
+
+2 4 9 6 5
+
+This array is not sorted, but quicksort will now sort the arrays 2 and 9 6 5, since 4 is now at the proper index. If 2 was just after 4, as follows
+
+4 2 6 9 5
+
+then we simply swap 4 and 2, which again yields the proper array for quicksort to continue. In this way, no allocations/insertions/deletions are done on the array - everything is done in-place. The rules for swapping with the pivot (4, in the example above) is therefore as follows:
+
++ the pivot is the first element in the list we are sorting with respect to the pivot
++ start with the element after the pivot, then proceed until the last element is checked. In this way, the element we are checking is always after the pivot.
++ if the element in question is in the wrong position relative to the pivot, then
+ - if the element is just after the pivot, swap the element with the pivot and continue to the next element
+ - if the element is not just after the pivot, then swap the element in question with the element just after the pivot, then swap the pivot with the element just after it.
+ 
+
+
