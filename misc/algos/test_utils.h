@@ -37,3 +37,13 @@ bool sorted(const Container &vals, Comparator comp)
 	}
 	return true;
 }
+
+template<typename Container>
+void show_container(Container ctr)
+{
+	for (auto &val : ctr)
+	{
+		cout << val << " ";
+	}
+	cout << endl;
+}
