@@ -9,6 +9,7 @@ So far I have:
 + `mergesort.cpp`, which contains a memory-efficient, procedural implementation of the mergesort algorithm
 + `quicksort.cpp`, which contains also a memory-efficient implementation of the quicksort algorithm. No allocations or deallocations are made during the sorting procedure.
 + `shellsort.cpp`, which contains an implementation of the shellsort algorithm
++ `combsort.cpp`, which contains an implementation the combsort algorithm
 + `test_utils.h` is a header file that contains functions to test whether sorting is done correctly
 
 #Additional Notes
